@@ -1,0 +1,13 @@
+{
+  "name": "project-show",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "browser-sync": "^2.3.1",
+    "gulp": "^3.8.11",
+    "gulp-autoprefixer": "^2.1.0",
+    "gulp-run": "^1.6.6",
+    "gulp-stylus": "^2.0.1",
+    "kouto-swiss": "^0.11.9"
+  }
+}

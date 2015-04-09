@@ -1,0 +1,11 @@
+{
+  "name": "write.ninja",
+  "root": "../",
+  "modules": {
+    "./<%= file %>": "app/src/frontend/js/*.js",
+    "jquery": "@jQuery"
+  },
+  "main": "./app",
+  "output": "app/www/static/js/app.js",
+  "shortcuts": true
+}
