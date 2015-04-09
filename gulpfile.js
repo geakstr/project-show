@@ -4,6 +4,7 @@ var gulp = require('gulp'),
   autoprefixer = require('gulp-autoprefixer'),
   koutoSwiss = require("kouto-swiss"),
   browserSync = require('browser-sync'),
+  nodemon = require('gulp-nodemon'),
   reload = browserSync.reload;
 
 gulp.task('dev', ['stylus-dev', 'js-dev', 'move-dev'], function() {
@@ -16,6 +17,15 @@ gulp.task('dev', ['stylus-dev', 'js-dev', 'move-dev'], function() {
   gulp.watch('app/src/frontend/stylus/*.styl', ['stylus-dev']);
   gulp.watch('app/src/frontend/js/*.js', ['js-dev']);
   gulp.watch("app/www/*.html").on('change', reload);
+
+  nodemon({
+    script: 'app/src/backend/server.js',
+    ext: 'js html',
+    nodeArgs: ['--harmony'],
+    env: {
+      'NODE_ENV': 'development'
+    }
+  })
 });
 
 gulp.task('stylus-dev', function() {
@@ -45,5 +55,6 @@ gulp.task('move-dev', function() {
     './bower_components/jquery/dist/jquery.min.js',
     './bower_components/jquery/dist/jquery.js',
     './bower_components/jquery/dist/jquery.min.map',
+    './bower_components/socket.io-client/socket.io.js',
   ]).pipe(gulp.dest('./app/www/static/vendor'));
 });

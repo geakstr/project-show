@@ -3,7 +3,8 @@
   "root": "../",
   "modules": {
     "./<%= file %>": "app/src/frontend/js/*.js",
-    "jquery": "@jQuery"
+    "jquery": "@jQuery",
+    "io": "@io"
   },
   "main": "./app",
   "output": "app/www/static/js/app.js",

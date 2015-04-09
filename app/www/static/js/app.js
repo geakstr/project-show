@@ -311,9 +311,11 @@ sb.on('stats:before-require-count', function (moduleName, module) {
 (this,(function (require, exports, module) { /* wrapped by builder */
 $(document).ready(function() {
   var $ = require('jquery');
+  var io = require('io');
 
-
+  var socket = io();
 });
 }),{
-"jquery": "@jQuery"
+"jquery": "@jQuery",
+"io": "@io"
 },{},{});
