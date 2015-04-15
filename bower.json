@@ -3,6 +3,8 @@
   "private": true,
   "dependencies": {
     "jquery": "2.1.3",
-    "socket.io-client": "~1.3.5"
+    "socket.io-client": "~1.3.5",
+    "bootstrap": "~3.3.4",
+    "nicescroll": "~3.6.0"
   }
 }

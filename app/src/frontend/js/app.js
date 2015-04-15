@@ -2,26 +2,34 @@ $(document).ready(function() {
   var $ = require('jquery');
   var io = require('io');
   var socket = io();
+  var chat = $('#chat');
 
-  var player = $('#player')[0];
+  chat.niceScroll({
+    cursorcolor: "#222",
+    cursorborder: "none",
+    autohidemode: false,
+    smoothscroll: false
+  });
 
-  player.addEventListener("play", function() {
+  var video = $('#video')[0];
+
+  video.addEventListener("play", function() {
     socket.emit('video play');
   });
 
-  player.addEventListener("pause", function() {
+  video.addEventListener("pause", function() {
     socket.emit('video pause');
   });
 
-  // player.addEventListener("timeupdate", function() {
-  //   socket.emit('video timeupdate', player.currentTime);
+  // video.addEventListener("timeupdate", function() {
+  //   socket.emit('video timeupdate', video.currentTime);
   // });
 
   socket.on('video play', function(msg) {
-    player.play();
+    video.play();
   });
 
   socket.on('video pause', function(msg) {
-    player.pause();
+    video.pause();
   });
 });

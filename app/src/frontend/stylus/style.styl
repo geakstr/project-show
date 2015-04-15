@@ -1,6 +1,5 @@
 @import "kouto-swiss"
 
-normalize();
 box-sizing-reset();
 
 $sans_serif = Verdana, Helvetica, Arial, sans-serif;
@@ -8,14 +7,120 @@ $serif = Baskerville, Cochin, Georgia, Times, Times New Roman, serif;
 $base_font = $sans_serif;
 
 body {
-  background: #000;
-  color: #fff;
+  background: #111;
+  color: #ddd;
   font-family: $base_font;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 22px;
 }
 
-#player {
-  display: block;
+#outer-wrapper {
+  width: 960px;
   margin: 44px auto;
+  
+  #video-wrapper {
+    float: left;
+    width: 640px;
+    height: 360px;
+    
+    #video-meta {
+      padding: 0 7px 11px 7px;
+      
+      #video-meta-title {
+        font-weight: 700;
+        color: #ecd88a;
+      }
+    }
+    
+    #video {
+      display: block;
+      width: 100%;
+      border-radius: 3px;
+    }
+  }
+
+  #chat-wrapper {
+    width: 100%;
+    padding-left: 662px;
+    
+    #chat-meta {
+      margin-bottom: 11px;
+      padding: 0 7px 11px 7px;
+      border-bottom: 1px solid #222;
+      color: #999;
+      
+      #chat-meta-username {
+        font-weight: 700;
+      }
+    }
+    
+    #chat {
+      height: 307px;
+      margin: 0 0 11px 0;
+      padding: 0 13px 0 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      list-style: none outside;
+      
+      .chat-message-wrapper {
+        margin-bottom: 11px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .chat-message {
+          display: inline-block;
+          background: rgba(0, 0, 0, 0.5);
+          color: #bbb;
+          border-radius: 7px;
+          padding: 3px 5px;
+          font-size: 14px;
+        }
+      }
+      
+      .chat-message-self .chat-message {
+        float: right;
+      }
+    }
+    
+    #chat-compose-message-wrapper {
+      height: 30px;
+      
+      #chat-compose-message-textarea {
+        display: block;
+        float: left;
+        width: 268px;
+        height: 100%;
+        margin: 0;
+        padding: 0 7px;
+        border: 0;
+        background: #ddd;
+        border-radius: 3px 0 0 3px;
+        font-size: 14px;
+        line-height: 30px;
+        color: #333;
+        resize: none;
+      }
+      
+      #chat-compose-message-submit {
+        display: block;
+        float: right;
+        width: 30px;
+        height: 100%;
+        border: 0;
+        background: #ccc;
+        border-radius: 0 3px 3px 0;
+        color: #333;
+        font-size: 14px;
+        line-height: 30px;
+        
+        &:hover {
+          background: #bbb;
+          color: #000;
+        }
+      }
+    }
+  }
 }
+

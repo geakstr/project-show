@@ -8,15 +8,15 @@ var gulp = require('gulp'),
   reload = browserSync.reload;
 
 gulp.task('dev', ['stylus-dev', 'js-dev', 'move-dev'], function() {
-  browserSync({
-    proxy: "project.show:8000",
-    notify: false,
-    open: false
-  });
+  // browserSync({
+  //   proxy: "project.show:8000",
+  //   notify: false,
+  //   open: false
+  // });
 
   gulp.watch('app/src/frontend/stylus/*.styl', ['stylus-dev']);
   gulp.watch('app/src/frontend/js/*.js', ['js-dev']);
-  gulp.watch("app/www/*.html").on('change', reload);
+  // gulp.watch("app/www/*.html").on('change', reload);
 
   nodemon({
     script: 'app/src/backend/server.js',
@@ -25,7 +25,7 @@ gulp.task('dev', ['stylus-dev', 'js-dev', 'move-dev'], function() {
     env: {
       'NODE_ENV': 'development'
     }
-  })
+  });
 });
 
 gulp.task('stylus-dev', function() {
@@ -38,23 +38,38 @@ gulp.task('stylus-dev', function() {
       browsers: ['last 2 versions'],
       cascade: true
     }))
-    .pipe(gulp.dest('app/www/static/css'))
-    .pipe(reload({
-      stream: true
-    }));
+    .pipe(gulp.dest('app/www/static/css'));
+  // .pipe(reload({
+  //   stream: true
+  // }));
 });
 
 gulp.task('js-dev', function() {
   run('lmd build app').exec(function() {
-    reload();
+    // reload();
   });
 });
 
 gulp.task('move-dev', function() {
   gulp.src([
     './bower_components/jquery/dist/jquery.min.js',
-    './bower_components/jquery/dist/jquery.js',
     './bower_components/jquery/dist/jquery.min.map',
     './bower_components/socket.io-client/socket.io.js',
   ]).pipe(gulp.dest('./app/www/static/vendor'));
+
+  gulp.src([
+    './bower_components/bootstrap/dist/js/bootstrap.min.js'
+  ]).pipe(gulp.dest('./app/www/static/vendor/bootstrap/js'));
+
+  gulp.src([
+    './bower_components/bootstrap/dist/css/bootstrap.min.css'
+  ]).pipe(gulp.dest('./app/www/static/vendor/bootstrap/css'));
+
+  gulp.src([
+    './bower_components/bootstrap/dist/fonts/*'
+  ]).pipe(gulp.dest('./app/www/static/vendor/bootstrap/fonts'));
+
+  gulp.src([
+    './bower_components/nicescroll/dist/*'
+  ]).pipe(gulp.dest('./app/www/static/vendor/nicescroll'));
 });
