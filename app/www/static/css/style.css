@@ -66,8 +66,10 @@ body {
   background: rgba(0,0,0,0.5);
   color: #bbb;
   border-radius: 7px;
-  padding: 3px 5px;
+  padding: 3px 5px 0 5px;
   font-size: 14px;
+  word-break: break-all;
+  max-width: 90%;
 }
 #outer-wrapper #chat-wrapper #chat .chat-message-wrapper .chat-message-time {
   color: #666;
