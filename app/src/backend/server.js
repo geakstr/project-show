@@ -46,6 +46,11 @@ io.on('connection', function(socket) {
     io.emit('video pause', msg);
   });
 
+  socket.on('chat message', function(msg) {
+    console.log('chat message: ' + msg);
+    socket.broadcast.emit('chat message', msg);
+  });
+
   // socket.on('video timeupdate', function(msg) {
   //   console.log('video timeupdate to ' + msg);
   //   io.emit('video timeupdate', msg);
