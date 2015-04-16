@@ -30,31 +30,23 @@ app.get('/', function * (next) {
 });
 
 io.on('connection', function(socket) {
-  console.log('connected');
+  socket.broadcast.emit('connected');
 
   socket.on('disconnect', function() {
-    console.log('disconnected');
+    socket.broadcast.emit('disconnected');
   });
 
   socket.on('video play', function(msg) {
-    console.log('video play');
-    io.emit('video play', msg);
+    socket.broadcast.emit('video play', msg);
   });
 
   socket.on('video pause', function(msg) {
-    console.log('video pause');
-    io.emit('video pause', msg);
+    socket.broadcast.emit('video pause', msg);
   });
 
   socket.on('chat message', function(msg) {
-    console.log('chat message: ' + msg);
     socket.broadcast.emit('chat message', msg);
   });
-
-  // socket.on('video timeupdate', function(msg) {
-  //   console.log('video timeupdate to ' + msg);
-  //   io.emit('video timeupdate', msg);
-  // });
 });
 
 server.listen(8000);

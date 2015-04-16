@@ -1,6 +1,7 @@
 $(document).ready(function() {
   var $ = require('jquery');
   var io = require('io');
+  var moment = require('moment');
   var socket = io();
 
   var video = $('#video')[0];
@@ -15,26 +16,43 @@ $(document).ready(function() {
       autohidemode: false,
       smoothscroll: false
     },
-    decorateMessage: function decorateMessage(msg, isSelf) {
+    appendMessage: function appendMessage(msg, messageType) {
+      var time = moment().format("HH:mm");
+
       var $wrapper = $('<li>');
       $wrapper.addClass('chat-message-wrapper clearfix');
-      $wrapper.addClass('chat-message-' + (isSelf ? 'self' : 'opponent'));
+      $wrapper.addClass('chat-message-' + messageType);
 
-      var $body = $('<div>');
-      $body.addClass('chat-message');
-      $body.text(msg);
+      var $message = $('<div>').addClass('chat-message').text(msg);
+      $message.append($('<div>').addClass('clearfix'));
+      $message.append($('<div>').addClass('chat-message-time').text(time));
+      $wrapper.append($message);
 
-      $wrapper.append($body);
+      chat.messages.append($wrapper);
 
-      return $wrapper;
+      setTimeout(function() {
+        chat.messages.getNiceScroll(0).doScrollTop(chat.messages[0].scrollHeight, 0);
+      }, 100);
     },
     sendMessage: function sendMessage() {
-      var msg = chat.textarea.val();
+      var msg = chat.textarea.val().trim();
+
+      if (msg.length === 0) {
+        return;
+      }
 
       socket.emit('chat message', msg);
 
-      chat.messages.append(chat.decorateMessage(msg, true));
+      chat.messages.append(chat.appendMessage(msg, 'self'));
       chat.textarea.val('');
+    },
+    messageTypes: {
+      1: 'self',
+      2: 'opponent',
+      3: 'event',
+      'self': 1,
+      'opponent': 2,
+      'event': 3
     }
   };
 
@@ -48,20 +66,26 @@ $(document).ready(function() {
     socket.emit('video pause');
   });
 
-  // video.addEventListener("timeupdate", function() {
-  //   socket.emit('video timeupdate', video.currentTime);
-  // });
+  socket.on('connected', function(msg) {
+    chat.appendMessage('Новый пользователь подключился', 'event');
+  });
+
+  socket.on('disconnected', function(msg) {
+    chat.appendMessage('Пользователь вышел', 'event');
+  });
 
   socket.on('video play', function(msg) {
     video.play();
+    chat.appendMessage('Начало воспроизведения', 'event');
   });
 
   socket.on('video pause', function(msg) {
     video.pause();
+    chat.appendMessage('Видео на паузе', 'event');
   });
 
   socket.on('chat message', function(msg) {
-    chat.messages.append(chat.decorateMessage(msg, false));
+    chat.appendMessage(msg, 'opponent');
   });
 
   chat.submit.on('click', function(event) {

@@ -4,7 +4,8 @@
   "modules": {
     "./<%= file %>": "app/src/frontend/js/*.js",
     "jquery": "@jQuery",
-    "io": "@io"
+    "io": "@io",
+    "moment": "@moment"
   },
   "main": "./app",
   "output": "app/www/static/js/app.js",

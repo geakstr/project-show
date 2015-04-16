@@ -72,4 +72,8 @@ gulp.task('move-dev', function() {
   gulp.src([
     './bower_components/nicescroll/dist/*'
   ]).pipe(gulp.dest('./app/www/static/vendor/nicescroll'));
+
+  gulp.src([
+    './bower_components/moment/min/moment-with-locales.min.js'
+  ]).pipe(gulp.dest('./app/www/static/vendor'));
 });
