@@ -330,13 +330,13 @@ $(document).ready(function() {
     appendMessage: function appendMessage(msg, messageType) {
       var time = moment().format("HH:mm");
 
-      var $wrapper = $('<li>');
-      $wrapper.addClass('chat-message-wrapper clearfix');
-      $wrapper.addClass('chat-message-' + messageType);
-
       var $message = $('<div>').addClass('chat-message').text(msg);
       $message.append($('<div>').addClass('clearfix'));
       $message.append($('<div>').addClass('chat-message-time').text(time));
+
+      var $wrapper = $('<li>');
+      $wrapper.addClass('chat-message-wrapper clearfix');
+      $wrapper.addClass('chat-message-' + messageType);
       $wrapper.append($message);
 
       chat.messages.append($wrapper);
@@ -354,16 +354,8 @@ $(document).ready(function() {
 
       socket.emit('chat message', msg);
 
-      chat.messages.append(chat.appendMessage(msg, 'self'));
+      chat.appendMessage(msg, 'self');
       chat.textarea.val('');
-    },
-    messageTypes: {
-      1: 'self',
-      2: 'opponent',
-      3: 'event',
-      'self': 1,
-      'opponent': 2,
-      'event': 3
     }
   };
 
