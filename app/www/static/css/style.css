@@ -13,6 +13,9 @@ body {
   font-size: 16px;
   line-height: 22px;
 }
+h1 {
+  color: #fff;
+}
 #outer-wrapper {
   width: 960px;
   margin: 44px auto;

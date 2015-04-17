@@ -25,27 +25,58 @@ app.use(router(app));
 var server = require('http').Server(app.callback());
 var io = require('socket.io')(server);
 
+// var users = {};
+// var rooms = [];
+
 app.get('/', function * (next) {
   yield this.render('index');
 });
 
-io.on('connection', function(socket) {
-  socket.broadcast.emit('connected');
+app.get('/room/:id', function * (next) {
+  yield this.render('room');
+});
 
+io.on('connection', function(socket) {
   socket.on('disconnect', function() {
-    socket.broadcast.emit('disconnected');
+    // delete users[socket.username];
+    socket.broadcast.to(socket.room).emit('disconnected', socket.username);
+    socket.leave(socket.room);
+
+    console.log(socket.username + ' disconnected and leave ' + socket.room + ' room');
+  });
+
+  socket.on('adduser', function(username) {
+    socket.username = username;
+    // users[username] = username;
+
+    console.log(socket.username + ' connected with ' + socket.id + ' socket id');
+  });
+
+  socket.on('joinroom', function(newroom) {
+    socket.leave(socket.room);
+    socket.join(newroom);
+    socket.room = newroom;
+
+    socket.broadcast.to(socket.room).emit('connected', socket.username);
+
+    console.log(socket.username + ' join to ' + socket.room + ' room');
   });
 
   socket.on('video play', function(msg) {
-    socket.broadcast.emit('video play', msg);
+    socket.broadcast.to(socket.room).emit('video play', msg);
+    //socket.broadcast.emit('video play', msg);
+    console.log('video play');
   });
 
   socket.on('video pause', function(msg) {
-    socket.broadcast.emit('video pause', msg);
+    socket.broadcast.to(socket.room).emit('video pause', msg);
+    //socket.broadcast.emit('video pause', msg);
+    console.log('video pause');
   });
 
   socket.on('chat message', function(msg) {
-    socket.broadcast.emit('chat message', msg);
+    socket.broadcast.to(socket.room).emit('chat message', msg);
+    //socket.broadcast.emit('chat message', msg);
   });
 });
 

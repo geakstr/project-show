@@ -309,102 +309,296 @@ sb.on('stats:before-require-count', function (moduleName, module) {
     main(lmd_trigger('lmd-register:decorate-require', 'main', lmd_require)[1], output.exports, output);
 })/*DO NOT ADD ; !*/
 (this,(function (require, exports, module) { /* wrapped by builder */
+var Cookie = require('./Cookie');
+
 $(document).ready(function() {
-  var $ = require('jquery');
-  var io = require('io');
-  var moment = require('moment');
-  var socket = io();
+  Number.tryParseInt = function(value, byref) {
+    if (value.toString().match(/^(\d)/) != null) {
+      if (byref != false)
+        value = parseInt(value);
+      return true;
+    } else return false;
+  }
 
-  var video = $('#video')[0];
+  var url = document.createElement('a');
+  url.href = document.URL;
 
-  var chat = {
-    messages: $('#chat'),
-    textarea: $('#chat-compose-message-textarea'),
-    submit: $('#chat-compose-message-submit'),
-    nicescroll: {
+  var route = url.pathname.split('/').filter(function(x) {
+    return x !== '';
+  });
+
+  switch (route[0]) {
+    // On concrete room page
+    case 'room':
+      if (Number.tryParseInt(route[1])) {
+        var Room = require('./Room');
+        var room = new Room(route[1]);
+      }
+      break;
+      // On other pages
+    default:
+      // Join room button click
+      $('.create-room-link').on('click', function() {
+        $this = $(this);
+        var username = $this.parent('.film-card-wrapper').find('.create-room-username');
+
+        if (username.hasClass('hidden')) {
+          username.removeClass('hidden');
+          username.focus();
+          $this.removeClass('btn-default');
+          $this.addClass('btn-success');
+          $this.attr('disabled', true);
+          return false;
+        } else {
+          var usernameVal = username.val().trim();
+          if (usernameVal.length !== 0) {
+            Cookie.create('username', usernameVal, 10);
+          }
+        }
+        return true;
+      });
+      // Everything changes to nickname text field
+      $('.create-room-username').on('input change', function() {
+        $this = $(this);
+        var username = $this.val().trim();
+        var submit = $this.parent('.film-card-wrapper').find('.create-room-link');
+        submit.attr('disabled', username.length === 0);
+      });
+      // Input something to nickname text field
+      $('.create-room-username').keypress(function(event) {
+        $this = $(this);
+
+        if ($this.val().trim().length !== 0) {
+          // Emulate click on create room button
+          if (event.which == 13) {
+            var submit = $this.parent('.film-card-wrapper').find('.create-room-link');
+            submit[0].click();
+            return false;
+          }
+        }
+        return true;
+      });
+  }
+});
+}),{
+"./Chat": (function (require, exports, module) { /* wrapped by builder */
+var $ = require('jquery');
+var moment = require('moment');
+
+var Chat = (function() {
+  function Chat(socket) {
+    this._socket = socket;
+
+    this._selfUser = {};
+    this._messages = $('#chat');
+    this._textarea = $('#chat-compose-message-textarea');
+    this._submit = $('#chat-compose-message-submit');
+    this._nicescrollConfig = {
       cursorcolor: "#222",
       cursorborder: "none",
       autohidemode: false,
       smoothscroll: false
-    },
-    appendMessage: function appendMessage(msg, messageType) {
-      var time = moment().format("HH:mm");
+    };
+    this._messages.niceScroll(this._nicescrollConfig);
 
-      var $message = $('<div>').addClass('chat-message').text(msg);
-      $message.append($('<div>').addClass('clearfix'));
-      $message.append($('<div>').addClass('chat-message-time').text(time));
+    this.eventHandlers();
+  }
 
-      var $wrapper = $('<li>');
-      $wrapper.addClass('chat-message-wrapper clearfix');
-      $wrapper.addClass('chat-message-' + messageType);
-      $wrapper.append($message);
+  Chat.prototype.appendMessage = function chatAppendMessage(msg, messageType) {
+    var time = moment().format("HH:mm");
 
-      chat.messages.append($wrapper);
+    var $message = $('<div>').addClass('chat-message').text(msg);
+    $message.append($('<div>').addClass('clearfix'));
+    $message.append($('<div>').addClass('chat-message-time').text(time));
 
-      setTimeout(function() {
-        chat.messages.getNiceScroll(0).doScrollTop(chat.messages[0].scrollHeight, 0);
-      }, 100);
-    },
-    sendMessage: function sendMessage() {
-      var msg = chat.textarea.val().trim();
+    var $wrapper = $('<li>');
+    $wrapper.addClass('chat-message-wrapper clearfix');
+    $wrapper.addClass('chat-message-' + messageType);
+    $wrapper.append($message);
 
-      if (msg.length === 0) {
-        return;
-      }
+    this._messages.append($wrapper);
 
-      socket.emit('chat message', msg);
-
-      chat.appendMessage(msg, 'self');
-      chat.textarea.val('');
-    }
+    setTimeout(function() {
+      this._messages.getNiceScroll(0).doScrollTop(this._messages[0].scrollHeight, 0);
+    }.bind(this), 100);
   };
 
-  chat.messages.niceScroll(chat.nicescroll);
+  Chat.prototype.sendMessage = function chatSendMessage() {
+    var msg = this._textarea.val().trim();
 
-  video.addEventListener("play", function() {
-    socket.emit('video play');
-  });
-
-  video.addEventListener("pause", function() {
-    socket.emit('video pause');
-  });
-
-  socket.on('connected', function(msg) {
-    chat.appendMessage('Новый пользователь подключился', 'event');
-  });
-
-  socket.on('disconnected', function(msg) {
-    chat.appendMessage('Пользователь вышел', 'event');
-  });
-
-  socket.on('video play', function(msg) {
-    video.play();
-    chat.appendMessage('Начало воспроизведения', 'event');
-  });
-
-  socket.on('video pause', function(msg) {
-    video.pause();
-    chat.appendMessage('Видео на паузе', 'event');
-  });
-
-  socket.on('chat message', function(msg) {
-    chat.appendMessage(msg, 'opponent');
-  });
-
-  chat.submit.on('click', function(event) {
-    chat.sendMessage();
-    return false;
-  });
-
-  chat.textarea.keypress(function(e) {
-    if (e.which == 13) {
-      chat.sendMessage();
-      return false;
+    if (msg.length === 0) {
+      return;
     }
-    return true;
+
+    this._socket.emit('chat message', msg);
+
+    this.appendMessage(msg, 'self');
+    this._textarea.val('');
+  };
+
+  Chat.prototype.eventHandlers = function chatEventHandlers() {
+    // Send message from client by click on send button
+    this._submit.on('click', function(event) {
+      this.sendMessage();
+      return false;
+    }.bind(this));
+
+    // Send message from client by press Enter in textarea
+    this._textarea.keypress(function(event) {
+      if (event.which == 13) {
+        this.sendMessage();
+        return false;
+      }
+      return true;
+    }.bind(this));
+  };
+
+  return Chat;
+})();
+
+module.exports = Chat;
+}),
+"./Cookie": (function (require, exports, module) { /* wrapped by builder */
+var Cookie = (function() {
+  function Cookie() {}
+
+  Cookie.create = function cookieCreate(name, value, days) {
+    var expires;
+
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toGMTString();
+    } else {
+      expires = "";
+    }
+    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+  }
+
+  Cookie.read = function cookieRead(name) {
+    var nameEQ = encodeURIComponent(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+  }
+
+  Cookie.remove = function cookieRemove(name) {
+    Cookie.create(name, "", -1);
+  }
+
+  return Cookie;
+})();
+
+module.exports = Cookie;
+}),
+"./Room": (function (require, exports, module) { /* wrapped by builder */
+var VideoPlayer = require('./VideoPlayer');
+var Chat = require('./Chat');
+var Cookie = require('./Cookie');
+
+var Room = (function() {
+  function Room(roomId) {
+    this._roomId = roomId;
+
+    this._socket = io();
+    this._video = new VideoPlayer(this._socket);
+    this._chat = new Chat(this._socket);
+
+    this._videoEventFromServer = false;
+
+    this._socket.emit('joinroom', this._roomId);
+
+    this.eventHandlers();
+  }
+
+  Room.prototype.eventHandlers = function roomEventHandlers() {
+    // Connecting with new user
+    this._socket.on('connect', function() {
+      this._socket.emit('adduser', Cookie.read('username'));
+    }.bind(this));
+
+    // New user connected from server
+    this._socket.on('connected', function(username) {
+      this._chat.appendMessage(username + ' здесь', 'event');
+    }.bind(this));
+
+    // User disconnected from server
+    this._socket.on('disconnected', function(username) {
+      this._chat.appendMessage(username + ' вышел', 'event');
+    }.bind(this));
+
+    // Play video from client
+    this._video.dom.addEventListener("play", function() {
+      this._chat.appendMessage('Начало воспроизведения', 'event');
+      if (!this._videoEventFromServer) {
+        this._socket.emit('video play');
+      }
+      this._videoEventFromServer = false;
+    }.bind(this));
+
+    // Pause video from client
+    this._video.dom.addEventListener("pause", function() {
+      this._chat.appendMessage('Видео на паузе', 'event');
+      if (!this._videoEventFromServer) {
+        this._socket.emit('video pause');
+      }
+      this._videoEventFromServer = false;
+    }.bind(this));
+
+    // Play video from server
+    this._socket.on('video play', function(msg) {
+      this._videoEventFromServer = true;
+      this._video.dom.play();
+    }.bind(this));
+
+    // Pause video from server
+    this._socket.on('video pause', function(msg) {
+      this._videoEventFromServer = true;
+      this._video.dom.pause();
+    }.bind(this));
+
+    // New chat message from server
+    this._socket.on('chat message', function(msg) {
+      this._chat.appendMessage(msg, 'opponent');
+    }.bind(this));
+  };
+
+  return Room;
+})();
+
+module.exports = Room;
+}),
+"./VideoPlayer": (function (require, exports, module) { /* wrapped by builder */
+var $ = require('jquery');
+
+var VideoPlayer = (function() {
+  function VideoPlayer(socket) {
+    this._socket = socket;
+    this._video = $('#video')[0];
+
+    this.eventHandlers();
+  }
+
+  Object.defineProperty(VideoPlayer.prototype, 'dom', {
+    get: function() {
+      return this._video;
+    },
+    enumerable: true
   });
-});
-}),{
+
+  VideoPlayer.prototype.eventHandlers = function videoPlayerEventHandlers() {
+
+  };
+
+  return VideoPlayer;
+})();
+
+module.exports = VideoPlayer;
+}),
 "jquery": "@jQuery",
 "io": "@io",
 "moment": "@moment"
