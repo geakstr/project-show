@@ -33,15 +33,15 @@ app.get('/', function * (next) {
 });
 
 app.get('/room/:id', function * (next) {
-  yield this.render('room/index');
+  yield this.render('room/desktop');
 });
 
 app.get('/room/:id/video', function * (next) {
-  yield this.render('room/index');
+  yield this.render('room/mobile');
 });
 
 app.get('/room/:id/chat', function * (next) {
-  yield this.render('room/index');
+  yield this.render('room/mobile');
 });
 
 app.post('/file-upload', function * (next) {
