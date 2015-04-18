@@ -63,6 +63,8 @@ app.post('/file-upload', koaBody, function * (next) {
   var newFileName = Utils.generateRandomString(10);
   var newPath = path.join(__dirname, projectRootDir + 'app/www/static/files/video/' + newFileName + '.mp4');
 
+  this.body = newFileName + ".mp4";
+
   var self = this;
   fs.readFile(oldPath, function(err, data) {
     fs.writeFile(newPath, data, function(err) {
@@ -74,8 +76,6 @@ app.post('/file-upload', koaBody, function * (next) {
       });
     });
   });
-
-  this.body = "AZAAZA";
 
   yield next;
 });

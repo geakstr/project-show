@@ -75,14 +75,27 @@ $(document).ready(function() {
       case 'streamingroom':
         var Video = require('./Video');
         var video = new Video();
-        Dropzone.options.myDropzone = {};
+        
         break;
         // On other pages
       default:
+		Dropzone.options.myDropzone = {'maxFiles' : 1,
+		   init: function() {
+   // this.on("addedfile", function(file) {alert('test'); $(this).removeClass('dz-clickable');$(this)[0].removeEventListener('click', this.listeners[1].events.click); }.bind(this));
+				this.on('success', function(file) {
+					//Cookie.create('video-url');
+					console.log(file.name);
+					//window.location.href = '/room/' + Room.generateRoomId(5);
+				});
+			}
+		};
         // Generate rooms id
         $('.create-room-link').each(function(index, element) {
           $(element).attr('href', '/room/' + Room.generateRoomId(5));
         });
+		$('.upload-film').on('click', function() {
+			$('#myDropzoneWrapper').show();
+		});		
         break;
     }
   }

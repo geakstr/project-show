@@ -1,10 +1,14 @@
 <div class="film-card-wrapper form-inline">
-  <h4>Название фильма 1</h4>
+  <h4>Название фильма 1 <a href="#" class="addToFavorite">&#9733;</a> </h4> 
   <a href="/room/1" class="btn btn-default create-room-link">Создать комнату</a>
 </div>
 <hr/>
 <div class="film-card-wrapper form-inline">
-  <h4>Название фильма 2</h4>
+  <h4>Название фильма 2 <a href="#" class="addToFavorite">&#9733;</a> </h4>
   <a href="/room/2" class="btn btn-default create-room-link">Создать комнату</a>
 </div>
-<a href="/" class="btn btn-default upload-film">Загрузить фильм</a>
+
+<a href="#" class="btn btn-default upload-film">Загрузить фильм</a>
+<div id="myDropzoneWrapper" style = "display: none">
+<form action="/file-upload" id="myDropzone"  class="dropzone" enctype="multipart/form-data">
+</div>
