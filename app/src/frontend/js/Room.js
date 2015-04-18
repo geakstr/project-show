@@ -12,10 +12,17 @@ var Room = (function() {
 
     this._videoEventFromServer = false;
 
-    this._socket.emit('joinroom', this._roomId);
+    this._socket.emit('joinroom', this._roomId, Cookie.read('video-url'));
 
     this.eventHandlers();
   }
+  
+  Object.defineProperty(Room.prototype, 'video', {
+    get: function() {
+      return this._video;
+    },
+    enumerable: true
+  });
 
   Room.generateRoomId = function roomGenerateRoomId(len) {
     var charSet = '0123456789';
@@ -32,6 +39,11 @@ var Room = (function() {
     this._socket.on('connect', function() {
       this._socket.emit('adduser', Cookie.read('username'));
     }.bind(this));
+	
+	this._socket.on('update video url', function(videoUrl) {
+		console.log(videoUrl);
+		$(this._video.dom).find('source').attr('src', videoUrl);
+	}.bind(this));
 
     // New user connected from server
     this._socket.on('connected', function(username) {

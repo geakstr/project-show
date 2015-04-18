@@ -36,7 +36,8 @@ var io = require('socket.io')(server);
 var BinaryServer = require('binaryjs').BinaryServer;
 var video = require('./video');
 // var users = {};
-// var rooms = [];
+
+var rooms = {};
 
 app.get('/', function * (next) {
   yield this.render('index');
@@ -96,12 +97,20 @@ io.on('connection', function(socket) {
     console.log(socket.username + ' connected with ' + socket.id + ' socket id');
   });
 
-  socket.on('joinroom', function(newroom) {
+  socket.on('joinroom', function(newroom, videoUrl) {
     socket.leave(socket.room);
     socket.join(newroom);
     socket.room = newroom;
-
+	
+	if (rooms[socket.room] === undefined) {
+		rooms[socket.room] = {
+			'socketid' : socket.id,
+			'videoUrl' : videoUrl
+		};
+	}
+	console.log(rooms[socket.room]['videoUrl']);
     socket.broadcast.to(socket.room).emit('connected', socket.username);
+	io.to(socket.id).emit('update video url', rooms[socket.room]['videoUrl']);
 
     console.log(socket.username + ' join to ' + socket.room + ' room');
   });
