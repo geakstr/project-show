@@ -67,6 +67,12 @@ $(document).ready(function() {
         }
         break;
         // On other pages
+      case 'streamingroom':
+        var Video = require('./Video');
+        var video = new Video();
+        Dropzone.options.myDropzone = {};
+        break;
+        // On other pages
       default:
         // Generate rooms id
         $('.create-room-link').each(function(index, element) {
