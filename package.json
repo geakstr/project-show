@@ -2,6 +2,7 @@
   "name": "project-show",
   "private": true,
   "dependencies": {
+    "binaryjs": "^0.2.1",
     "koa": "^0.19.0",
     "koa-router": "^4.3.2",
     "koa-static": "^1.4.9",
