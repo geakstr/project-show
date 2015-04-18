@@ -46,9 +46,9 @@ $(document).ready(function() {
       // On concrete room page
       case 'room':
         var room = new Room(route[1]);
-		if (Cookie.read('video-url') !== null) {
-			$(room.video.dom).find('source').attr('src', Cookie.read('video-url'));
-		}
+      // if (Cookie.read('video-url') !== null) {
+      //   $(room.video.dom).find('source').attr('src', Cookie.read('video-url'));
+      // }
         if (Number.tryParseInt(route[1])) {
           if (route[2] === 'video') {
             $('#outer-wrapper > *').hide();
@@ -77,26 +77,27 @@ $(document).ready(function() {
       case 'streamingroom':
         var Video = require('./Video');
         var video = new Video();
-        
+
         break;
         // On other pages
       default:
-		Dropzone.options.myDropzone = {'maxFiles' : 1,
-		   init: function() {
-   // this.on("addedfile", function(file) {alert('test'); $(this).removeClass('dz-clickable');$(this)[0].removeEventListener('click', this.listeners[1].events.click); }.bind(this));
-				this.on('success', function(file, response) {
-					Cookie.create('video-url', response, 1);
-					window.location.href = '/room/' + Room.generateRoomId(5);
-				});
-			}
-		};
+        Dropzone.options.myDropzone = {
+          'maxFiles': 1,
+          init: function() {
+            // this.on("addedfile", function(file) {alert('test'); $(this).removeClass('dz-clickable');$(this)[0].removeEventListener('click', this.listeners[1].events.click); }.bind(this));
+            this.on('success', function(file, response) {
+              Cookie.create('video-url', response, 1);
+              window.location.href = '/room/' + Room.generateRoomId(5);
+            });
+          }
+        };
         // Generate rooms id
         $('.create-room-link').each(function(index, element) {
           $(element).attr('href', '/room/' + Room.generateRoomId(5));
         });
-		$('.upload-film').on('click', function() {
-			$('#myDropzoneWrapper').show();
-		});		
+        $('.upload-film').on('click', function() {
+          $('#myDropzoneWrapper').show();
+        });
         break;
     }
   }

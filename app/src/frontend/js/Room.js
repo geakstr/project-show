@@ -16,7 +16,7 @@ var Room = (function() {
 
     this.eventHandlers();
   }
-  
+
   Object.defineProperty(Room.prototype, 'video', {
     get: function() {
       return this._video;
@@ -39,11 +39,12 @@ var Room = (function() {
     this._socket.on('connect', function() {
       this._socket.emit('adduser', Cookie.read('username'));
     }.bind(this));
-	
-	this._socket.on('update video url', function(videoUrl) {
-		console.log(videoUrl);
-		$(this._video.dom).find('source').attr('src', videoUrl);
-	}.bind(this));
+
+    this._socket.on('update video url', function(videoUrl) {
+      this._video.dom.pause();
+      $(this._video.dom).find('source').attr('src', "/files/video/" + videoUrl);
+      this._video.dom.load();
+    }.bind(this));
 
     // New user connected from server
     this._socket.on('connected', function(username) {
