@@ -45,8 +45,25 @@ $(document).ready(function() {
     switch (route[0]) {
       // On concrete room page
       case 'room':
+        var room = new Room(route[1]);
+
         if (Number.tryParseInt(route[1])) {
-          var room = new Room(route[1]);
+          if (route[2] === 'video') {
+            $('#outer-wrapper > *').hide();
+            $('#video-meta').hide();
+            $('#outer-wrapper').css({
+              "margin": "0",
+              "padding": "0"
+            });
+            $('#video-wrapper').show();
+          } else if (route[2] === 'chat') {
+            $('#outer-wrapper > *').hide();
+            $('#outer-wrapper').css({
+              "margin": "0",
+              "padding": "0"
+            });
+            $('#chat-wrapper').show();
+          }
         }
         break;
         // On other pages
