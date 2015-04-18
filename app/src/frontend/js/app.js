@@ -56,6 +56,8 @@ $(document).ready(function() {
               "padding": "0"
             });
             $('#video-wrapper').show();
+            $('#outer-wrapper').css('width', '100%');
+            $('#video-wrapper').css('width', '100%');
           } else if (route[2] === 'chat') {
             $('#outer-wrapper > *').hide();
             $('#outer-wrapper').css({
@@ -63,6 +65,9 @@ $(document).ready(function() {
               "padding": "0"
             });
             $('#chat-wrapper').show();
+            $('#chat-wrapper').css('padding-left', '0');
+            $('#chat-compose-message-textarea').css('width', "100%");
+            $('#outer-wrapper').css('width', '100%');
           }
         }
         break;

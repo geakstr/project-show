@@ -7,6 +7,7 @@ var serve = require('koa-static');
 var koaBody = require('koa-body')({
   'multipart': true
 });
+var Utils = require('../frontend/js/Utils');
 
 var projectRootDir = "../../../";
 
@@ -58,20 +59,25 @@ app.get('/streamingroom/:id', function * (next) {
 });
 
 app.post('/file-upload', koaBody, function * (next) {
-  console.log(this.request.body.files.file.path);
-  this.body = "AZAAZA";
-
-  var oldPath = fs.createReadStream(this.request.body.files.file.path);
-  var newPath = fs.createWriteStream(path.join(__dirname, projectRootDir + 'app/www/static/files/video/test.mp4'));
+  var oldPath = this.request.body.files.file.path;
+  var newFileName = Utils.generateRandomString(10);
+  var newPath = path.join(__dirname, projectRootDir + 'app/www/static/files/video/' + newFileName + '.mp4');
 
   var self = this;
-  fs.readFile(self.request.body.files.file.path, function(err, data) {
-    fs.writeFile(path.join(__dirname, projectRootDir + 'app/www/static/files/video/test.mp4'), data, function(err) {
-      fs.unlink(self.request.body.files.file.path, function() {
-        if (err) throw err;
+  fs.readFile(oldPath, function(err, data) {
+    fs.writeFile(newPath, data, function(err) {
+      fs.unlink(oldPath, function() {
+        if (err) {
+          console.log(err);
+          throw err;
+        }
       });
     });
   });
+
+  this.body = "AZAAZA";
+
+  yield next;
 });
 
 io.on('connection', function(socket) {
