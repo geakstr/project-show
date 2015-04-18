@@ -24,6 +24,11 @@ $(document).ready(function() {
         var room = new Room(route[1]);
       }
       break;
+	case 'streamingroom':
+		var Video = require('./Video');
+		var video = new Video();
+		Dropzone.options.myDropzone = { };
+		break;
       // On other pages
     default:
       // Join room button click

@@ -1,14 +1,18 @@
+var fs = require('fs');
 var path = require('path');
 var koa = require('koa');
 var router = require('koa-router');
 var render = require('koa-ejs');
 var serve = require('koa-static');
+var koaBody = require('koa-body')({'multipart' : true });
 
 var projectRootDir = "../../../";
 
 var app = koa();
 
 app.use(serve(path.join(__dirname, projectRootDir + 'app/www/static')));
+
+
 
 render(app, {
   root: path.join(__dirname, projectRootDir + 'app/www/views'),
@@ -25,6 +29,9 @@ app.use(router(app));
 var server = require('http').Server(app.callback());
 var io = require('socket.io')(server);
 
+// add these two lines near the variable declarations at the top
+var BinaryServer = require('binaryjs').BinaryServer;
+var video        = require('./video');
 // var users = {};
 // var rooms = [];
 
@@ -34,6 +41,27 @@ app.get('/', function * (next) {
 
 app.get('/room/:id', function * (next) {
   yield this.render('room');
+});
+
+app.get('/streamingroom/:id', function * (next) {
+  yield this.render('streamingroom');
+});
+
+app.post('/file-upload', koaBody, function * (next) {
+	console.log(this.request.body.files.file.path);
+	this.body = "AZAAZA";
+	
+	var oldPath = fs.createReadStream(this.request.body.files.file.path);
+	var newPath = fs.createWriteStream(path.join(__dirname, projectRootDir + 'app/www/static/files/video/test.mp4'));
+	
+	var self = this;
+	fs.readFile(self.request.body.files.file.path , function(err, data) {
+		fs.writeFile(path.join(__dirname, projectRootDir + 'app/www/static/files/video/test.mp4'), data, function(err) {
+			fs.unlink(self.request.body.files.file.path, function(){
+				if(err) throw err;
+			});
+		}); 
+	});
 });
 
 io.on('connection', function(socket) {
@@ -81,3 +109,26 @@ io.on('connection', function(socket) {
 });
 
 server.listen(8000);
+// add this after the call to server.listen()
+bs = new BinaryServer({ port: 9000 });
+
+bs.on('connection', function (client) {
+    client.on('stream', function (stream, meta) {
+        switch(meta.event) {
+        // list available videos
+        case 'list':
+            video.list(stream, meta);
+            break;
+ 
+        // request for a video
+        case 'request':
+            video.request(client, meta);
+            break;
+ 
+        // attempt an upload
+        case 'upload':
+        // default:
+            video.upload(stream, meta);
+        }
+    });
+});
