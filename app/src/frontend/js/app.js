@@ -1,14 +1,8 @@
 var Cookie = require('./Cookie');
+var Utils = require('./Utils');
+var Room = require('./Room');
 
 $(document).ready(function() {
-  Number.tryParseInt = function(value, byref) {
-    if (value.toString().match(/^(\d)/) != null) {
-      if (byref != false)
-        value = parseInt(value);
-      return true;
-    } else return false;
-  }
-
   var url = document.createElement('a');
   url.href = document.URL;
 
@@ -16,56 +10,52 @@ $(document).ready(function() {
     return x !== '';
   });
 
-  switch (route[0]) {
-    // On concrete room page
-    case 'room':
-      if (Number.tryParseInt(route[1])) {
-        var Room = require('./Room');
-        var room = new Room(route[1]);
+  $('#username-modal').modal({
+    'backdrop': false,
+    'keyboard': false,
+    'show': false
+  });
+
+
+  if (Cookie.read('username') === null || Cookie.read('username').length === 0) {
+    $('#username-modal').modal('show');
+  }
+  $('#username-modal').find('.username-input').keypress(function(event) {
+    $this = $(this);
+
+    if ($this.val().trim().length !== 0) {
+      if (event.which == 13) {
+        Cookie.create('username', $this.val().trim(), 10);
+        $('#username-modal').modal('hide');
+        return false;
       }
-      break;
-      // On other pages
-    default:
-      // Join room button click
-      $('.create-room-link').on('click', function() {
-        $this = $(this);
-        var username = $this.parent('.film-card-wrapper').find('.create-room-username');
+    }
+  });
 
-        if (username.hasClass('hidden')) {
-          username.removeClass('hidden');
-          username.focus();
-          $this.removeClass('btn-default');
-          $this.addClass('btn-success');
-          $this.attr('disabled', true);
-          return false;
-        } else {
-          var usernameVal = username.val().trim();
-          if (usernameVal.length !== 0) {
-            Cookie.create('username', usernameVal, 10);
-          }
-        }
-        return true;
-      });
-      // Everything changes to nickname text field
-      $('.create-room-username').on('input change', function() {
-        $this = $(this);
-        var username = $this.val().trim();
-        var submit = $this.parent('.film-card-wrapper').find('.create-room-link');
-        submit.attr('disabled', username.length === 0);
-      });
-      // Input something to nickname text field
-      $('.create-room-username').keypress(function(event) {
-        $this = $(this);
+  var wasUsername = Cookie.read('username');
+  $('#username-modal').on('hide.bs.modal', function(event) {
+    setupRoutes();
+  });
 
-        if ($this.val().trim().length !== 0) {
-          // Emulate click on create room button
-          if (event.which == 13) {
-            var submit = $this.parent('.film-card-wrapper').find('.create-room-link');
-            submit[0].click();
-            return false;
-          }
+  if (Cookie.read('username') !== null && Cookie.read('username').length !== 0) {
+    setupRoutes();
+  }
+
+  function setupRoutes() {
+    switch (route[0]) {
+      // On concrete room page
+      case 'room':
+        if (Number.tryParseInt(route[1])) {
+          var room = new Room(route[1]);
         }
-        return true;
-      });
+        break;
+        // On other pages
+      default:
+        // Generate rooms id
+        $('.create-room-link').each(function(index, element) {
+          $(element).attr('href', '/room/' + Room.generateRoomId(5));
+        });
+        break;
+    }
   }
 });
