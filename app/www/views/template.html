@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name=viewport content='width=700'>
-  <title>project.show</title>
+  <title>Orbita Show</title>
+  <link href='http://fonts.googleapis.com/css?family=Denk+One|Alfa+Slab+One|Sigmar+One|Cinzel:400,700,900' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -11,7 +12,17 @@
 
 <div id="outer-wrapper">
 <div id="header">
-  <h1><a href="/">Project Show</a></h1>
+  <div class="row">
+    <div class="col-md-6">
+      <h1 id="title"><img src="/imgs/logo.png" id="logo" style="height: 55px;"><a href="/">Orbita Show</a></h1>
+    </div>
+    <div class="col-md-3 choose-video" style="display: none;">
+      <form action="/file-upload" id="myDropzone" class="dropzone" enctype="multipart/form-data"></form>
+    </div>
+    <div class="col-md-3 choose-room" style="display: none;">
+      <input type="text" style="width: 100%; margin-top: 7px;" value="" class="choose-room-input form-control" placeholder="№ комнаты"/>
+    </div>
+  </div>
 </div>
 
 <%- body %>

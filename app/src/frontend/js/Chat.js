@@ -20,12 +20,17 @@ var Chat = (function() {
     this.eventHandlers();
   }
 
-  Chat.prototype.appendMessage = function chatAppendMessage(msg, messageType) {
+  Chat.prototype.appendMessage = function chatAppendMessage(msg, messageType, username) {
     var time = moment().format("HH:mm");
 
     var $message = $('<div>').addClass('chat-message').text(msg);
     $message.append($('<div>').addClass('clearfix'));
-    $message.append($('<div>').addClass('chat-message-time').text(time));
+    var $meta = $('<div>');
+    if (username !== undefined) {
+      $meta.append($('<span>').addClass('chat-message-username').text(username));
+    }
+    $meta.append($('<span>').addClass('chat-message-time').text(time));
+    $message.append($meta);
 
     var $wrapper = $('<li>');
     $wrapper.addClass('chat-message-wrapper clearfix');
