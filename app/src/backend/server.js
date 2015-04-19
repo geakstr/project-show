@@ -107,6 +107,10 @@ io.on('connection', function(socket) {
         'socketid': socket.id,
         'videoUrl': videoUrl
       };
+
+      if (videoUrl === null) {
+        rooms[socket.room]['videoUrl'] = 'big_buck_bunny.mp4';
+      }
     }
     socket.broadcast.to(socket.room).emit('connected', socket.username);
     io.to(socket.id).emit('update video url', rooms[socket.room]['videoUrl']);
@@ -127,7 +131,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('chat message', function(msg) {
-    socket.broadcast.to(socket.room).emit('chat message', msg);
+    socket.broadcast.to(socket.room).emit('chat message', msg, socket.username);
     //socket.broadcast.emit('chat message', msg);
   });
 });

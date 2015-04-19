@@ -348,6 +348,10 @@ $(document).ready(function() {
     setupRoutes();
   });
 
+  $('#username-modal').on('shown.bs.modal', function(event) {
+    $('#username-input').focus();
+  });
+
   if (Cookie.read('username') !== null && Cookie.read('username').length !== 0) {
     setupRoutes();
   }
@@ -357,9 +361,9 @@ $(document).ready(function() {
       // On concrete room page
       case 'room':
         var room = new Room(route[1]);
-      // if (Cookie.read('video-url') !== null) {
-      //   $(room.video.dom).find('source').attr('src', Cookie.read('video-url'));
-      // }
+        // if (Cookie.read('video-url') !== null) {
+        //   $(room.video.dom).find('source').attr('src', Cookie.read('video-url'));
+        // }
         if (Number.tryParseInt(route[1])) {
           if (route[2] === 'video') {
             $('#outer-wrapper > *').hide();
@@ -618,8 +622,8 @@ var Room = (function() {
     }.bind(this));
 
     // New chat message from server
-    this._socket.on('chat message', function(msg) {
-      this._chat.appendMessage(msg, 'opponent');
+    this._socket.on('chat message', function(msg, username) {
+      this._chat.appendMessage(username + " " + msg, 'opponent');
     }.bind(this));
   };
 

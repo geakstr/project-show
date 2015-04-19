@@ -87,8 +87,8 @@ var Room = (function() {
     }.bind(this));
 
     // New chat message from server
-    this._socket.on('chat message', function(msg) {
-      this._chat.appendMessage(msg, 'opponent');
+    this._socket.on('chat message', function(msg, username) {
+      this._chat.appendMessage(username + " " + msg, 'opponent');
     }.bind(this));
   };
 
