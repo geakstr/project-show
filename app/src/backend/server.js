@@ -44,7 +44,9 @@ app.get('/', function * (next) {
 });
 
 app.get('/room/:id', function * (next) {
-  yield this.render('room/desktop');
+  yield this.render('room/desktop', {
+
+  });
 });
 
 app.get('/room/:id/video', function * (next) {

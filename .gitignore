@@ -106,3 +106,5 @@ $RECYCLE.BIN/
 *.lnk
 
 /bower_components
+
+/app/www/static/files/video/*
